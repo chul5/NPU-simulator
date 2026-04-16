@@ -31,6 +31,24 @@ def judge(score_cross, score_x):
         return 'Cross'
     return 'X'
 
+def input_matrix(n, label):
+    print(f"{label} ({n}줄 입력, 공백 구분)")
+
+    rows = []
+    while len(rows):
+        line = input()
+        tokens = line.split()
+        if len(tokens) != n:
+            print(f"입력 형식 오류: 각 줄에 {n}개의 숫자를 공백으로 구분해 입력하시오")
+            rows = []
+            continue
+        try:
+            rows.append([float(f) for t in tokes])
+        except ValueError:
+            print(f"입력 형식 오류: 숫자만 입력하시오")
+            rows =[]
+    return Matrix(rows)
+
 def main():
     print("=== Mini NPU Simulator ===")
     print()
