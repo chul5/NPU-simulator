@@ -6,6 +6,14 @@ class Matrix:
     def get(self, row, col):
         return self.data[row][col]
 
+def mac(pattern, filter_):
+    total = 0.0
+    n = pattern.n
+    for i in range(n):
+        for j in range(n):
+            total += pattern.get(i, j) * filter_.get(i,j)
+    return total
+
 def main():
     print("=== Mini NPU Simulator ===")
     print()
@@ -24,3 +32,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
