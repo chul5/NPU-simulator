@@ -14,6 +14,23 @@ def mac(pattern, filter_):
             total += pattern.get(i, j) * filter_.get(i,j)
     return total
 
+EPSILON = 1e-9
+
+def normalize_label(raw):
+    v = raw.strip().lower()
+    if v in ('+', 'cross'):
+        return 'Cross'
+    if v == 'x':
+        return 'X'
+    raise ValueError(f"알 수 없는 라벨: {raw!r}")
+
+def judge(score_cross, score_x):
+    if abs(score_cross - score_x) < EPSILON:
+        return 'UNDECIDED'
+    if score_cross > score_x:
+        return 'Cross'
+    return 'X'
+
 def main():
     print("=== Mini NPU Simulator ===")
     print()
