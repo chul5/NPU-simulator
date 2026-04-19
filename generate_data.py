@@ -17,11 +17,14 @@ def make_x(n):
 
 data = {
     "filters": {
+        "size_3":  {"cross": make_cross(3), "x": make_x(3)},
         "size_5":  {"cross": make_cross(5),  "x": make_x(5)},
         "size_13": {"cross": make_cross(13), "x": make_x(13)},
         "size_25": {"cross": make_cross(25), "x": make_x(25)}
     },
     "patterns": {
+        "size_3_1":  {"input": make_cross(3),  "expected": "+"},
+        "size_3_2":  {"input": make_x(3),      "expected": "x"},
         "size_5_1":  {"input": make_cross(5),  "expected": "+"},
         "size_5_2":  {"input": make_x(5),      "expected": "x"},
         "size_13_1": {"input": make_cross(13), "expected": "+"},

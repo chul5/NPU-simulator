@@ -148,7 +148,7 @@ def mode_json():
     print("#----------------------------------------")
     print(f"{'크기':<10} {'평균 시간(ms)':>14} {'연산 횟수':>10}")
     print("-" * 40)
-    for n in [5, 13, 25]:
+    for n in [3, 5, 13, 25]:
         sample = filters[f"size_{n}"]["Cross"]
         avg_ms = measure_mac(sample, sample)
         ops    = n * n
