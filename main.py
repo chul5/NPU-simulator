@@ -144,6 +144,17 @@ def mode_json():
     print("#----------------------------------------")
     print("# 결과 요약")
     print("#----------------------------------------")
+    print("# 성능 분석 (평균/10회)")
+    print("#----------------------------------------")
+    print(f"{'크기':<10} {'평균 시간(ms)':>14} {'연산 횟수':>10}")
+    print("-" * 40)
+    for n in [5, 13, 25]:
+        sample = filters[f"size_{n}"]["Cross"]
+        avg_ms = measure_mac(sample, sample)
+        ops    = n * n
+        print(f"{str(n)+'×'+str(n):<10} {avg_ms:>14.3f} {ops:>10}")
+    print()
+    print("#----------------------------------------")
     print(f"총 테스트: {total}개  /  통과: {passed}개  /  실패: {failed}개")
 
 def main():
