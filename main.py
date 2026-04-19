@@ -1,4 +1,5 @@
 import time
+import json
 
 class Matrix:
     def __init__(self, data):
@@ -86,6 +87,65 @@ def mode_manual():
     else:
         print("판정: B")
 
+def load_data_json(path="data.json"):
+    with open(path, encoding="utf-8") as f:
+        raw = json.load(f)
+
+    filters = {}
+    for size_key, filter_pair in raw["filters"].items():
+        n = int(size_key.split("_")[1])
+        filters[size_key] = {
+            normalize_label(k): Matrix(v)
+            for k, v in filter_pair.items()
+        }
+
+    patterns = {}
+    for pat_key, case in raw["patterns"].items():
+        n = int(pat_key.split("_")[1])
+        patterns[pat_key] = {
+            "input":    Matrix(case["input"]),
+            "expected": normalize_label(case["expected"]),
+            "size_key": f"size_{n}"
+        }
+
+    return filters, patterns
+
+def mode_json():
+    filters, patterns = load_data_json()
+
+    print()
+    print("#----------------------------------------")
+    print("# 패턴 분석 (라벨 정규화 적용)")
+    print("#----------------------------------------")
+
+    results = []
+    for pat_key, case in patterns.items():
+        size_key = case["size_key"]
+        f_cross  = filters[size_key]["Cross"]
+        f_x      = filters[size_key]["X"]
+
+        score_cross = mac(case["input"], f_cross)
+        score_x     = mac(case["input"], f_x)
+        verdict     = judge(score_cross, score_x)
+        expected    = case["expected"]
+        outcome     = "PASS" if verdict == expected else "FAIL"
+
+        print(f"--- {pat_key} ---")
+        print(f"Cross 점수: {score_cross}  |  X 점수: {score_x}")
+        print(f"판정: {verdict}  |  expected: {expected}  |  {outcome}")
+        print()
+
+        results.append(outcome)
+
+    total  = len(results)
+    passed = results.count("PASS")
+    failed = results.count("FAIL")
+
+    print("#----------------------------------------")
+    print("# 결과 요약")
+    print("#----------------------------------------")
+    print(f"총 테스트: {total}개  /  통과: {passed}개  /  실패: {failed}개")
+
 def main():
     print("=== Mini NPU Simulator ===")
     print()
@@ -97,7 +157,7 @@ def main():
     if choice == "1":
         mode_manual()
     elif choice == "2":
-        print("(모드 2는 다음 단계에서 구현합니다)")
+        mode_json()
     else:
         print("1 또는 2를 입력하세요.")
 
