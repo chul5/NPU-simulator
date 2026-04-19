@@ -35,7 +35,7 @@ def input_matrix(n, label):
     print(f"{label} ({n}줄 입력, 공백 구분)")
 
     rows = []
-    while len(rows):
+    while len(rows) < n:
         line = input()
         tokens = line.split()
         if len(tokens) != n:
@@ -43,7 +43,7 @@ def input_matrix(n, label):
             rows = []
             continue
         try:
-            rows.append([float(f) for t in tokes])
+            rows.append([float(t) for t in tokens])
         except ValueError:
             print(f"입력 형식 오류: 숫자만 입력하시오")
             rows =[]
