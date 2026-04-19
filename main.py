@@ -81,11 +81,19 @@ def mode_manual():
     print(f"연산 시간(평균/10회): {avg_ms:.3f} ms")
 
     if abs(score_a - score_b) < EPSILON:
-        print("판정: UNDECIDED")
+        print("판정: 판정 불가")
     elif score_a > score_b:
         print("판정: A")
     else:
         print("판정: B")
+
+    print()
+    print("#----------------------------------------")
+    print("# 성능 분석 (평균/10회)")
+    print("#----------------------------------------")
+    print(f"{'크기':<10} {'평균 시간(ms)':>14} {'연산 횟수':>10}")
+    print("-" * 40)
+    print(f"{'3×3':<10} {avg_ms:>14.3f} {n*n:>10}")
 
 def load_data_json(path="data.json"):
     with open(path, encoding="utf-8") as f:
@@ -119,23 +127,41 @@ def mode_json():
     print("#----------------------------------------")
 
     results = []
+    failed_cases = []
     for pat_key, case in patterns.items():
-        size_key = case["size_key"]
-        f_cross  = filters[size_key]["Cross"]
-        f_x      = filters[size_key]["X"]
+        try:
+            size_key = case["size_key"]
+            if size_key not in filters:
+                raise ValueError(f"필터 없음: {size_key}")
+            f_cross = filters[size_key]["Cross"]
+            f_x     = filters[size_key]["X"]
+            pat_n = case["input"].n
+            if pat_n != f_cross.n:
+                raise ValueError(f"크기 불일치: 패턴 {pat_n}×{pat_n} vs 필터 {f_cross.n}×{f_cross.n}")
 
-        score_cross = mac(case["input"], f_cross)
-        score_x     = mac(case["input"], f_x)
-        verdict     = judge(score_cross, score_x)
-        expected    = case["expected"]
-        outcome     = "PASS" if verdict == expected else "FAIL"
+            score_cross = mac(case["input"], f_cross)
+            score_x     = mac(case["input"], f_x)
+            verdict     = judge(score_cross, score_x)
+            expected    = case["expected"]
+            outcome     = "PASS" if verdict == expected else "FAIL"
 
-        print(f"--- {pat_key} ---")
-        print(f"Cross 점수: {score_cross}  |  X 점수: {score_x}")
-        print(f"판정: {verdict}  |  expected: {expected}  |  {outcome}")
-        print()
+            print(f"--- {pat_key} ---")
+            print(f"Cross 점수: {score_cross}  |  X 점수: {score_x}")
+            print(f"판정: {verdict}  |  expected: {expected}  |  {outcome}")
+            print()
 
-        results.append(outcome)
+            results.append(outcome)
+            if outcome == "FAIL":
+                reason = "동점(UNDECIDED)" if verdict == "UNDECIDED" else f"판정 {verdict} ≠ expected {expected}"
+                failed_cases.append((pat_key, reason))
+
+        except Exception as e:
+            print(f"--- {pat_key} ---")
+            print(f"오류: {e}")
+            print(f"판정: FAIL")
+            print()
+            results.append("FAIL")
+            failed_cases.append((pat_key, str(e)))
 
     total  = len(results)
     passed = results.count("PASS")
@@ -156,6 +182,11 @@ def mode_json():
     print()
     print("#----------------------------------------")
     print(f"총 테스트: {total}개  /  통과: {passed}개  /  실패: {failed}개")
+    if failed_cases:
+        print()
+        print("실패 케이스:")
+        for key, reason in failed_cases:
+            print(f"  - {key}: {reason}")
 
 def main():
     print("=== Mini NPU Simulator ===")
