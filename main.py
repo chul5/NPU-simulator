@@ -1,3 +1,5 @@
+import time
+
 class Matrix:
     def __init__(self, data):
         self.n = len(data)
@@ -49,6 +51,41 @@ def input_matrix(n, label):
             rows =[]
     return Matrix(rows)
 
+def measure_mac(pattern, filter_, repeat=10):
+    start = time.perf_counter()
+    for _ in range(repeat):
+        mac(pattern, filter_)
+    elapsed = time.perf_counter() - start
+    return (elapsed / repeat) * 1000
+
+def mode_manual():
+    n = 3
+    print()
+    filter_a = input_matrix(n, "필터 A")
+    print()
+    filter_b = input_matrix(n, "필터 B")
+    print()
+    pattern = input_matrix(n, "패턴")
+
+    score_a = mac(pattern, filter_a)
+    score_b = mac(pattern, filter_b)
+    avg_ms  = measure_mac(pattern, filter_a)
+
+    print()
+    print("#----------------------------------------")
+    print("# MAC 결과")
+    print("#----------------------------------------")
+    print(f"A 점수: {score_a}")
+    print(f"B 점수: {score_b}")
+    print(f"연산 시간(평균/10회): {avg_ms:.3f} ms")
+
+    if abs(score_a - score_b) < EPSILON:
+        print("판정: UNDECIDED")
+    elif score_a > score_b:
+        print("판정: A")
+    else:
+        print("판정: B")
+
 def main():
     print("=== Mini NPU Simulator ===")
     print()
@@ -58,7 +95,7 @@ def main():
     choice = input("선택: ").strip()
 
     if choice == "1":
-        print("(모드 1은 다음 단계에서 구현합니다)")
+        mode_manual()
     elif choice == "2":
         print("(모드 2는 다음 단계에서 구현합니다)")
     else:
